@@ -29,18 +29,31 @@ public class HttpWebApi
         return new OkObjectResult("Welcome Jaspreet Bath!");
     }
 
+
     [Function("GetStudents")]
     public async Task<HttpResponseData> GetStudents(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "students")] HttpRequestData req)
+    [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "students")] HttpRequestData req)
     {
-        _logger.LogInformation("C# HTTP GET/posts trigger function processed a request in GetStudents().");
+        _logger.LogInformation("Processing GetStudents request.");
 
-        var students = await _context.Students.ToArrayAsync();
+        try
+        {
+            var students = await _context.Students.ToArrayAsync();
 
-        var response = req.CreateResponse(HttpStatusCode.OK);
-        response.Headers.Add("Content-Type", "application/json");
-        await response.WriteStringAsync(JsonConvert.SerializeObject(students));
-        return response;
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            response.Headers.Add("Content-Type", "application/json");
+            await response.WriteStringAsync(JsonConvert.SerializeObject(students));
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Database query failed.");
+
+            var errorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
+            errorResponse.Headers.Add("Content-Type", "text/plain");
+            await errorResponse.WriteStringAsync($"Database Error: {ex.Message}");
+            return errorResponse;
+        }
     }
 
     [Function("GetStudentById")]

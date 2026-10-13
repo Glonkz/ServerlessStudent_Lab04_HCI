@@ -22,9 +22,13 @@ public partial class SchoolContext : DbContext
         if (!optionsBuilder.IsConfigured)
         {
             var connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
-            optionsBuilder.UseSqlServer(connectionString);
+            if (!string.IsNullOrEmpty(connectionString))
+            {
+                optionsBuilder.UseSqlServer(connectionString);
+            }
         }
     }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
