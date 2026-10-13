@@ -12,9 +12,11 @@ builder.ConfigureFunctionsWebApplication();
 // Add Entity Framework DbContext
 builder.Services.AddDbContext<SchoolContext>(options =>
 {
-    var connectionString =
-Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
-    options.UseSqlServer(connectionString);
+    var connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
+    if (!string.IsNullOrEmpty(connectionString))
+    {
+        options.UseSqlServer(connectionString);
+    }
 });
 
 // Add HttpClient as singleton
